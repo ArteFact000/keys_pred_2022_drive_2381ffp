@@ -89,9 +89,10 @@ def get_ride_id(conn, competition_id):
     else:
         return '0'
 
-def add_telemetric_data(conn, ride_id='1.1', pilot='None', angle='0', velocity='0', trajectory='0'):
-    sql_create_ride = """ INSERT {} (pilot, angle, velocity, trajectory) VALUES ("{}", "{}", "{}", "{}") """.format(ride_id, pilot, angle, velocity, trajectory)
-
+def add_telemetric_data(conn, ride_id='1_1', json_arg='None'):
+    #def add_telemetric_data(conn, ride_id='1_1', pilot='None', angle='0', velocity='0', trajectory='0'):
+    #sql_create_ride = """ INSERT {} (pilot, angle, velocity, trajectory) VALUES ("{}", "{}", "{}", "{}") """.format(ride_id, pilot, angle, velocity, trajectory)
+    sql_create_ride = """ INSERT {} (json) VALUES ("{}")""".format(ride_id, json_arg)
     c = conn.cursor()
     c.execute(sql_create_ride)
     conn.commit()
@@ -102,7 +103,8 @@ def start_a_ride(conn, competition_index='1', ride_type='64', pilots=[], begin_t
 
     c = conn.cursor()
     c.execute(sql_create_ride)
-    sqlt = "CREATE TABLE IF NOT EXISTS {}_{} (id INTEGER PRIMARY KEY AUTO_INCREMENT, pilot text, angle text, velocity text, trajectory text) ENGINE=INNODB;".format(competition_index, get_ride_id(conn, competition_index))
+    #sqlt = "CREATE TABLE IF NOT EXISTS {}_{} (id INTEGER PRIMARY KEY AUTO_INCREMENT, pilot text, angle text, velocity text, trajectory text) ENGINE=INNODB;".format(competition_index, get_ride_id(conn, competition_index))
+    sqlt = "CREATE TABLE IF NOT EXISTS {}_{} (id INTEGER PRIMARY KEY AUTO_INCREMENT, json text) ENGINE=INNODB;".format(competition_index, get_ride_id(conn, competition_index))
     print(sqlt)
     c.execute(sqlt)
     conn.commit()
@@ -147,11 +149,12 @@ def interface(conn):
             end_t = input("Enter the time of end: ")
             start_a_ride(conn, competition_index, type, pilots, begin_t, end_t)
         def telemetric_data_creation_interface(ride_id):
-            pilot = input("Enter the number/name of pilot: ")
-            angle = input("Enter the angle: ")
-            velocity = input("Enter the velocity: ")
-            trajectory = input("Enter the trajectory: ")
-            add_telemetric_data(conn, ride_id, pilot, angle, velocity, trajectory)
+            json_a = input("Enter a json-string: ")
+            #pilot = input("Enter the number/name of pilot: ")
+            #angle = input("Enter the angle: ")
+            #velocity = input("Enter the velocity: ")
+            #trajectory = input("Enter the trajectory: ")
+            add_telemetric_data(conn, ride_id=ride_id, json_arg=json_a)
         def show_competitions():
             compts = get_competitions(conn)
             arr = ['Back\n']
@@ -187,6 +190,7 @@ def interface(conn):
                         telemetric_data_creation_interface(local_ride_index)
         elif choice[1] == 2:
             clear_the_base(conn)
+            break
         else:
             break
 def main():
